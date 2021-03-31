@@ -1,0 +1,1 @@
+math.sin(x[0])*math.sin(x[1])*math.exp(-(x[0]**2+x[1]**2))
