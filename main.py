@@ -1,39 +1,78 @@
 import math
+from math import sin, cos, exp, sqrt, pi, log
 from task_function import TaskFunction
 from os import system
+from os import listdir
 
 # Initialization
 quit_bool = False
 filesDir = './Templates/'
-currentFunction = TaskFunction(filesDir + '2_Rosenbrock.txt')
+currentFunction = None
 
+fncDatabase = []
+fncDisplay = {} # For switching between templates
+
+for file in listdir(filesDir):
+    if not currentFunction: # make the first file a default function
+        currentFunction = TaskFunction(filesDir + file)
+
+    fncDatabase.append(TaskFunction(filesDir + file))
+    fncDisplay[len(fncDatabase)] = [fncDatabase[-1].fncName, fncDatabase[-1].fnc]
+
+# system('pause')
+    
 def change_current_parameters():
+    system('cls')
     print('chaning parameters')
     system('pause')
 
 def change_to_template():
-    print('chaning to temp')
-    system('pause')
+    global currentFunction
+    system('cls')
+    print('Wybierz funckję zadania do rozwiązania: ')
+    for k, v in fncDisplay.items():
+        print(k, ' - ', v[0])
+        # print('   ', v[1])                      
+    
+    newFncNr = int(input('Wybrana funkcja: ')) # get the input and make it an int
+
+    if newFncNr in fncDisplay: # does input exist as a key in the fnc dictionary
+        currentFunction = fncDatabase[newFncNr-1]
+    else:
+        print('Zly nr funkcji :(')
+    
+    # fncIndex = fncDisplay.get(newFncNr, lambda: 'Zly nr funkcji :(')
+    # print(fncIndex)
+    
+    # system('pause')
 
 def change_to_test():
+    system('cls')
     print('chaning to test')
     system('pause')
 
 def change_to_manual():
+    system('cls')
     print('chaning to manual')
     system('pause')
 
 def calculate_task():
+    system('cls')
     print('calculate_task')
     system('pause')
 
 def quit_program():
+    # system('cls')
     global quit_bool # explicite adress global, not local, variable
 
-    print('quit_program')
+    # print('quit_program')
     quit_bool = True
-    system('pause')
-    
+    # system('pause')
+
+def invalid_menu_input():
+    system('cls')
+    print("\n Wpisano zły numerek :( \n")
+    system('pause')    
 
 
 def handle_menu_input(argument):
@@ -46,14 +85,13 @@ def handle_menu_input(argument):
         '6': quit_program,                # '6 - Wyjdź'
     }
     # Get the function from menu_functions dictionary
+    # menu_functions.get(argument, invalid_menu_input())()
     func = menu_functions.get(argument)
     if func:
         # Execute the function
         func()
     else:
-        print("\n Wpisano zły numerek :( \n")
-        system('pause')
-    
+        invalid_menu_input()
 
 
 def display_menu():
@@ -69,14 +107,13 @@ def display_menu():
     print('5 - Policz')
     print('6 - Wyjdź')
     print()
-    print('Wybór: ')
 
 
 if __name__ == '__main__':
 
     while(not quit_bool):
         display_menu()
-        menu_option = input()
+        menu_option = input('Wybór: ')
         system('cls')
         handle_menu_input(menu_option)
 
