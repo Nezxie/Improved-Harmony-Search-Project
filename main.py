@@ -1,14 +1,15 @@
 import math
 from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
 from task_function import TaskFunction # Class handling task/function data
-from os import SEEK_END, system, listdir
+from os import system, listdir
+
 # from menu import handle_menu_input, display_menu # waits for extra program modules
 
 # I use those interchangeably: 
 # task - function - file
 # currentFunction - default - currFnc
 
-#Koko
+
 
 ####### Initialization #######
 
@@ -26,6 +27,7 @@ for file in listdir(filesDir):
         currentFunction = TaskFunction(filesDir + file)
 
     # Database of TaskFunction class objects
+
     fncDatabase.append(TaskFunction(filesDir + file)) 
     # Display tries to keeps up; Stores task name and equation
     fncDisplay[len(fncDatabase)] = [fncDatabase[-1].fncName, fncDatabase[-1].fnc]
@@ -135,27 +137,33 @@ def calculate_task():
     global currentFunction
     system('cls')
 
-    print('Wzór zadania:')
-    print('     ', currentFunction.fnc)
-
-    AlgoZrobiony = False
-
-    if not AlgoZrobiony:    
-        x = []      # something for eval() to work on
-        print('Podaj wartosci x dla ktorych trza policzyc: ')
-        for i in range(len(currentFunction.x)):
-            inputInfo = 'Wartość x[' + str(i) + ']: '
-            x.append(float(input(inputInfo)))
-        
-        y=eval(currentFunction.fnc)
-        print(y, ' B) ')
+    x = []      # something for eval() to work on
+    print('Podaj wartosci x dla ktorych trza policzyc: ')
+    for i in range(len(currentFunction.x)):
+        inputInfo = 'Wartość x[' + str(i) + ']: '
+        x.append(float(input(inputInfo)))
     
-    else:  # Tutaj wklej IHS
-        print('O tu')
+    y=eval(currentFunction.fnc)
+    print(y, ' B) ')
     
-
     system('pause')
 
+#NOWOŚĆ :O
+'''def calculate_IHS():
+    IHS(TaskFunction)
+    f_values=[] #wartosci funkcji
+    iter=0
+    max_iter=1000
+    kryt_wzrostu=0.001
+    zmiana=1
+    while iter<max_iter && zmiana>kryt_wzrostu:
+        new_x=IHS.improvise_new()
+        f_values(iter)=IHS.calculate(new_x)
+        zmiana=IHS.update(new_x,f(iter))
+    plot(iter,f_values)
+    #if TaskFunction.x=2
+        #graph()  #co przyjmuje graph sprawdzic sobie !!!!
+'''
 def quit_program():
     """Quit main loop using bool variable"""
     global quit_bool 
@@ -220,4 +228,3 @@ while(not quit_bool):
     menu_option = input('Wybór: ')
     system('cls')
     handle_menu_input(menu_option)
-
