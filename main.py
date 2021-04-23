@@ -8,6 +8,7 @@ from os import SEEK_END, system, listdir
 # task - function - file
 # currentFunction - default - currFnc
 
+#Koko
 
 ####### Initialization #######
 
