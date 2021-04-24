@@ -2,7 +2,7 @@ import math
 from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
 from task_function import TaskFunction # Class handling task/function data
 from os import system, listdir
-
+from IHS import IHS
 # from menu import handle_menu_input, display_menu # waits for extra program modules
 
 # I use those interchangeably: 
@@ -133,7 +133,7 @@ def change_to_manual():
     # system('pause')
 
 def calculate_task():
-    """ 2nd Stage of Project: calculations"""
+    """ 2nd Stage of the Project: calculations"""
     global currentFunction
     system('cls')
 
@@ -149,9 +149,12 @@ def calculate_task():
     system('pause')
 
 #NOWOŚĆ :O
-'''def calculate_IHS():
-    IHS(TaskFunction)
-    f_values=[] #wartosci funkcji
+def calculate_IHS():
+    algo = IHS(currentFunction) # without "algo": missing 1 required positional argument: 'self'
+    algo.displayParameters() 
+    system('pause')
+
+'''    f_values=[] #wartosci funkcji
     iter=0
     max_iter=1000
     kryt_wzrostu=0.001
@@ -164,6 +167,7 @@ def calculate_task():
     #if TaskFunction.x=2
         #graph()  #co przyjmuje graph sprawdzic sobie !!!!
 '''
+
 def quit_program():
     """Quit main loop using bool variable"""
     global quit_bool 
@@ -191,7 +195,8 @@ def handle_menu_input(argument):
         '3': change_to_test,              # '3 - Zmień f. celu na testową(f. kwadratowa)'
         '4': change_to_manual,            # '4 - Wpisz ręcznie nową f. celu'        
         '5': calculate_task,              # '5 - Policz'
-        '6': quit_program,                # '6 - Wyjdź'
+        '6': calculate_IHS,              
+        '7': quit_program,                # '7 - Wyjdź'
     }
     # Get the function from menu_functions dictionary
     # niewypał: menu_functions.get(argument, invalid_menu_input())()
@@ -215,7 +220,8 @@ def display_menu(currentFnc):
     print('3 - Zmień f. celu na testową(f. kwadratowa)')
     print('4 - Wpisz ręcznie nową f. celu(utwórz plik)')
     print('5 - Policz')
-    print('6 - Wyjdź')
+    print('6 - IHS')
+    print('7 - Wyjdź')
     print()
 
 
