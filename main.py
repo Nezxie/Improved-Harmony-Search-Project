@@ -1,5 +1,5 @@
 import math
-from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
+from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin' #TO NIE DZIALA PRZYNAJMNIEJ U MNIE TRZEBA PISAC MATH.EXP, NIE MOZE TAK BYC :<
 from task_function import TaskFunction # Class handling task/function data
 from os import system, listdir
 from IHS import IHS

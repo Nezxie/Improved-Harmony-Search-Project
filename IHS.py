@@ -75,7 +75,7 @@ class IHS:
     def improvise_new(self):
         ran = random()
         NHV=[]
-        PVB=[]
+        PVB=[ x_i_Range[0], x_i_Range[1]] #pvb here
 
         for i in range(self.N):
             self.PAR=PAR(gn) #gn = dana generacja numer
@@ -94,11 +94,17 @@ class IHS:
                         if PVB[0]>=D_3:
                             NHV[i]=D_3
             else:
-                NHV[i]=randint(PVB[0],PVB[1]) #co to pvb?
+                NHV[i]=randint(PVB[0],PVB[1]) #co to pvb? possible value bound for x_i  to jest chyba zakres z ktorego sie losuje jesli losowane i ... w sumie to chyba jest po prostu zkres w jakim x jest xd
         return NHV
 
-    def update_HM(self,x, f_x):     # TODO
-        self.calculate_f_x(self)
-        #czy lepszy?
-        #dodaj nowa, usun najgorsza
-        #work still in progress :/
+    def update_HM(self,x):     
+        worst=-math.inf
+        solution=self.calculate_f_x(x)
+        self.HM.append(SolutionVector(x, solution))
+        for i in HM:
+            if HM[i].f_x>worst:
+                worst=HM[i].f_x
+                wektor=HM[i].x_values
+       # HM.del(...?) #nie wiem jak usunac ten najgorszy z takiej struktury ;/
+        return 
+       
