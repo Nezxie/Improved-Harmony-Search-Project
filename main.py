@@ -10,9 +10,7 @@ from IHS import IHS
 # currentFunction - default - currFnc
 
 
-
 ####### Initialization #######
-
 
 quit_bool = False           # For exiting the main loop
 filesDir = './Templates/'   # Directory with templates functions .txt files
@@ -35,7 +33,6 @@ for file in listdir(filesDir):
 
 
 ####### Various cool functions (which should be in seperate modules) #######
-
 
 def change_current_parameters(): 
     """Change parameters of the current task."""
@@ -148,15 +145,26 @@ def calculate_task():
     
     system('pause')
 
-#NOWOŚĆ :O
 def calculate_IHS():
+    max_iterations = 2000
+    desired_result = 0.01 # TODO change to lack of progress in last iterations
+    
     algo = IHS(currentFunction) # without "algo": missing 1 required positional argument: 'self'
     algo.displayParameters() 
+    print('Nacisnij przycisk aby zaczac obliczac: ')
+    system('pause')
+
+    ###################################
+    # Step 5: Check Stopping Criteria
+    ###################################
     iterations = 0
-    while algo.Return_best_f_x() > 0.01 or iterations > 1000:
-        algo.update_HM(algo.improvise_new())
+    # Improvise and update until max iterations passed or algo is better than desired result. 
+    while algo.best_f_x() > desired_result and iterations < max_iterations:
+        algo.improvise_and_update()
+        iterations += 1
+    # Summary after hard work:
     algo.displayParameters() 
-    print('Komentarz z Rosenbrock: ')     # Yup, has to be on nr. 2, look below
+    print('Komentarz z obecnej funkcji: ')
     print('     ', currentFunction.scoreComment)
     system('pause')
 
