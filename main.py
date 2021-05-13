@@ -1,12 +1,14 @@
 import math
-from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
+from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin' #TO NIE DZIALA PRZYNAJMNIEJ U MNIE TRZEBA PISAC MATH.EXP, NIE MOZE TAK BYC :<
 from task_function import TaskFunction # Class handling task/function data
-from os import SEEK_END, system, listdir
+from os import system, listdir
+from IHS import IHS
 # from menu import handle_menu_input, display_menu # waits for extra program modules
 
 # I use those interchangeably: 
 # task - function - file
 # currentFunction - default - currFnc
+
 
 
 ####### Initialization #######
@@ -25,6 +27,7 @@ for file in listdir(filesDir):
         currentFunction = TaskFunction(filesDir + file)
 
     # Database of TaskFunction class objects
+
     fncDatabase.append(TaskFunction(filesDir + file)) 
     # Display tries to keeps up; Stores task name and equation
     fncDisplay[len(fncDatabase)] = [fncDatabase[-1].fncName, fncDatabase[-1].fnc]
@@ -130,30 +133,46 @@ def change_to_manual():
     # system('pause')
 
 def calculate_task():
-    """ 2nd Stage of Project: calculations"""
+    """ 2nd Stage of the Project: calculations"""
     global currentFunction
     system('cls')
 
-    print('Wzór zadania:')
-    print('     ', currentFunction.fnc)
-
-    AlgoZrobiony = False
-
-    if not AlgoZrobiony:    
-        x = []      # something for eval() to work on
-        print('Podaj wartosci x dla ktorych trza policzyc: ')
-        for i in range(len(currentFunction.x)):
-            inputInfo = 'Wartość x[' + str(i) + ']: '
-            x.append(float(input(inputInfo)))
-        
-        y=eval(currentFunction.fnc)
-        print(y, ' B) ')
+    x = []      # something for eval() to work on
+    print('Podaj wartosci x dla ktorych trza policzyc: ')
+    for i in range(len(currentFunction.x)):
+        inputInfo = 'Wartość x[' + str(i) + ']: '
+        x.append(float(input(inputInfo)))
     
-    else:  # Tutaj wklej IHS
-        print('O tu')
+    y=eval(currentFunction.fnc)
+    print(y, ' B) ')
     
-
     system('pause')
+
+#NOWOŚĆ :O
+def calculate_IHS():
+    algo = IHS(currentFunction) # without "algo": missing 1 required positional argument: 'self'
+    algo.displayParameters() 
+    iterations = 0
+    while algo.Return_best_f_x() > 0.01 or iterations > 1000:
+        algo.update_HM(algo.improvise_new())
+    algo.displayParameters() 
+    print('Komentarz z Rosenbrock: ')     # Yup, has to be on nr. 2, look below
+    print('     ', currentFunction.scoreComment)
+    system('pause')
+
+'''    f_values=[] #wartosci funkcji
+    iter=0
+    max_iter=1000
+    kryt_wzrostu=0.001
+    zmiana=1
+    while iter<max_iter && zmiana>kryt_wzrostu:
+        new_x=IHS.improvise_new()
+        f_values(iter)=IHS.calculate(new_x)
+        zmiana=IHS.update(new_x,f(iter))
+    plot(iter,f_values)
+    #if TaskFunction.x=2
+        #graph()  #co przyjmuje graph sprawdzic sobie !!!!
+'''
 
 def quit_program():
     """Quit main loop using bool variable"""
@@ -182,7 +201,8 @@ def handle_menu_input(argument):
         '3': change_to_test,              # '3 - Zmień f. celu na testową(f. kwadratowa)'
         '4': change_to_manual,            # '4 - Wpisz ręcznie nową f. celu'        
         '5': calculate_task,              # '5 - Policz'
-        '6': quit_program,                # '6 - Wyjdź'
+        '6': calculate_IHS,              
+        '7': quit_program,                # '7 - Wyjdź'
     }
     # Get the function from menu_functions dictionary
     # niewypał: menu_functions.get(argument, invalid_menu_input())()
@@ -206,7 +226,8 @@ def display_menu(currentFnc):
     print('3 - Zmień f. celu na testową(f. kwadratowa)')
     print('4 - Wpisz ręcznie nową f. celu(utwórz plik)')
     print('5 - Policz')
-    print('6 - Wyjdź')
+    print('6 - IHS')
+    print('7 - Wyjdź')
     print()
 
 
@@ -219,4 +240,3 @@ while(not quit_bool):
     menu_option = input('Wybór: ')
     system('cls')
     handle_menu_input(menu_option)
-

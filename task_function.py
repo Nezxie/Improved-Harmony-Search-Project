@@ -19,7 +19,8 @@ class TaskFunction:
         xRanges = list(map(int, taskData[1].split()))
         self.x = []
         for i in range(0, len(xRanges), 2):   # get pairs of x[i] min and max values
-            self.x.append([xRanges[i], xRanges[i+1]])   # x[i] = [x_imin, x_imax]
+           self.x.append([xRanges[i], xRanges[i+1]])   # x[i] = [x_imin, x_imax]
+
         # Any comment about fnc, it's opti score etc.
         self.scoreComment = taskData[2][0:-1] # [0:-1] removes \n at end of line
     
@@ -29,6 +30,8 @@ class TaskFunction:
         print('Równanie funkcji: ')
         print('      ', self.fnc)
         print()
-        for x_i in range(len(self.x)):
-            print('Zakres x[', x_i, ']: ', self.x[x_i])
+        i=0
+        for x_i in self.x:
+            print('Zakres x[', i, ']: ', '[',x_i[0], x_i[1],']')
+            i=i+1
         print('Komentarz wyniku: ', self.scoreComment)
