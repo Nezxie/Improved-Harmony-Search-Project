@@ -146,10 +146,11 @@ def calculate_task():
     system('pause')
 
 def calculate_IHS():
-    max_iterations = 2000
+    max_iterations = 200000
     desired_result = 0.01 # TODO change to lack of progress in last iterations
+    min_result_change=0.00001
     
-    algo = IHS(currentFunction) # without "algo": missing 1 required positional argument: 'self'
+    algo = IHS(currentFunction,max_iterations) # without "algo": missing 1 required positional argument: 'self'
     algo.displayParameters() 
     print('Nacisnij przycisk aby zaczac obliczac: ')
     system('pause')
@@ -159,10 +160,14 @@ def calculate_IHS():
     ###################################
     iterations = 0
     # Improvise and update until max iterations passed or algo is better than desired result. 
-    while algo.best_f_x() > desired_result and iterations < max_iterations:
-        algo.improvise_and_update()
+    while iterations < max_iterations: #algo.best_f_x() > desired_result and
+        result_change=algo.improvise_and_update()
+        
+        if result_change<min_result_change:
+            break
         iterations += 1
     # Summary after hard work:
+    print('TU JEST RESULT CHANGE!!!!!' ,result_change)
     algo.displayParameters() 
     print('Komentarz z obecnej funkcji: ')
     print('     ', currentFunction.scoreComment)

@@ -7,7 +7,7 @@ from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
 class IHS:
     """ Handles the best algorithm in the whole galaxy. """
     
-    def __init__(self, FncToCalculate):
+    def __init__(self, FncToCalculate, NI):
         ###################################
         # Step 1: Initialize Paramters:   
         ###################################
@@ -21,7 +21,12 @@ class IHS:
         self.PAR = 0.6 # to mielismy zmieniac, prawdopodobienstwo pitch adjustingu -> x=x+rand*bw
         self.bw = 1/10 # distance bound wide, liczone w step3
         self.accuracy = 2 # how many digits are being considered 0.XXXX
-        
+        self.PAR_max=0.99
+        self.PAR_min=0.35
+        self.bw_max=4
+        self.bw_min=1/1000000
+        self.NI=NI
+        self.c=math.log(self.bw_min/self.bw_max)/self.NI
         ###################################
         # Step 2: Initialize HM:
         ###################################
@@ -86,14 +91,18 @@ class IHS:
         # Step 3: Improvise New Harmony
         ###################################
         NHV = [None] * self.N # "New Harmony Vector" - Stores new decision variables values
-
+        
         for i in range(self.N): # iterate over each dec. var. x
             # TODO - is PAR and bw common, or separate for each x?
             # Narazie zakładam stałe, brane z "self."
-            # self.PAR = PAR(gn) #gn = dana generacja numer
-            # self.bw = bw(gn)
+            
+            self.PAR=self.PAR_min+((self.PAR_max-self.PAR_min)/self.NI)*i
+            self.bw=self.bw_max*math.exp(self.c*i)
+           # self.PAR = PAR[i] #gn = dana generacja numer
+            #self.bw = bw[i]
             # PAR = self.PAR #gn = dana generacja numer
             # bw = self.bw
+            
 
             # Get Possible Value Bounds for given x[i]
             PVB_lower = self.xRanges[i][0]
@@ -129,6 +138,7 @@ class IHS:
 
         # Calculate result for the NHV
         new_result = self.calculate_f_x(NHV)
+        result_change=abs(new_result-self.best_f_x()) #liczenie do przerwania jeśli zmiana za mała (w mainie)
         # print('Nowy wynik z wektorem: ', new_result, '   ', NHV) # For debug
         
         # Create a list of sorted dictionary keys, from lowest f_x to highest
@@ -140,5 +150,5 @@ class IHS:
             self.HM[new_result] = NHV       # Add new vector and result to HM
         # print(self.HM) # for debug
 
-        return new_result
+        return result_change #new_result
     
