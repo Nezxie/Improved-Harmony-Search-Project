@@ -152,6 +152,12 @@ def calculate_task():
 def calculate_IHS():
     algo = IHS(currentFunction) # without "algo": missing 1 required positional argument: 'self'
     algo.displayParameters() 
+    iterations = 0
+    while algo.Return_best_f_x() > 0.01 or iterations > 1000:
+        algo.update_HM(algo.improvise_new())
+    algo.displayParameters() 
+    print('Komentarz z Rosenbrock: ')     # Yup, has to be on nr. 2, look below
+    print('     ', currentFunction.scoreComment)
     system('pause')
 
 '''    f_values=[] #wartosci funkcji
