@@ -3,6 +3,9 @@ from math import sin, cos, exp, sqrt, pi, log   # Instead of 'math.sin' -> 'sin'
 from task_function import TaskFunction # Class handling task/function data
 from os import system, listdir
 from IHS import IHS
+import numpy as np
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
 # from menu import handle_menu_input, display_menu # waits for extra program modules
 
 # I use those interchangeably: 
@@ -161,16 +164,48 @@ def calculate_IHS():
     iterations = 0
     # Improvise and update until max iterations passed or algo is better than desired result. 
     while iterations < max_iterations: #algo.best_f_x() > desired_result and
-        result_change=algo.improvise_and_update()
+        result_change=algo.improvise_and_update(iterations)
         
         if result_change<min_result_change:
             break
         iterations += 1
     # Summary after hard work:
-    print('TU JEST RESULT CHANGE!!!!!' ,result_change)
+    #print('TU JEST RESULT CHANGE!!!!!' ,result_change)
     algo.displayParameters() 
     print('Komentarz z obecnej funkcji: ')
     print('     ', currentFunction.scoreComment)
+
+     ###################################
+    # Rysowanie dla funkcji dwuch zmiennych (wykres 2D)
+    ###################################
+
+    if  len(currentFunction.x)==2:
+        point=algo.HM.get(algo.best_f_x())
+        delta = 0.1 #co ile krok, im mniejszy tym lepiej
+        x=[0,0,0,0,0]
+        Z=[]
+        a = np.arange(currentFunction.x[0][0], currentFunction.x[0][1], delta)
+        y = np.arange(currentFunction.x[1][0], currentFunction.x[1][1], delta)
+        X, Y = np.meshgrid(a, y)
+        for i in range(len(Y)): #po wszystich Y
+           x[1]=Y[i,0]
+           tmpZ=[]
+           for j in range(len(X[0])):
+               x[0]=X[0,j]
+               tmpZ.append(eval(currentFunction.fnc))
+           Z.append(tmpZ)
+
+        fig,ax = plt.subplots()
+        CS = ax.contour(X, Y, Z,levels=20) #wyswietlanie, levels = ilosc lini
+        ax.clabel(CS, inline=True, fontsize=10)  #numerowanie warotsci warstwic
+        ax.set_title('Warstwica ')
+        ax.plot(point[0],point[1],'o',color='red')
+        fig=plt.figure()
+        ax3D= plt.axes(projection='3d')
+        ax3D.contour3D(X,Y,Z,50) #50 - ilosc warstwic
+        ax3D.plot3D(point[0],point[1],algo.best_f_x(),'red',marker='o')
+        plt.show()
+    #print(algo.HM.get(algo.best_f_x()))
     system('pause')
 
 '''    f_values=[] #wartosci funkcji

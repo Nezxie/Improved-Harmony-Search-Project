@@ -84,21 +84,21 @@ class IHS:
             Sorted_f_x = sorted(self.HM)
             return Sorted_f_x[0] # Lowest is the first one
 
-    def improvise_and_update(self): 
+    def improvise_and_update(self,gn): 
         """ First, improvise new harmony, then update the HM.
             Step 5, checking stop criteria is done outside! (watch out for PAR, bw values)"""
         ###################################
         # Step 3: Improvise New Harmony
         ###################################
-        NHV = [None] * self.N # "New Harmony Vector" - Stores new decision variables values
         
+        NHV = [None] * self.N # "New Harmony Vector" - Stores new decision variables values
+        self.PAR=self.PAR_min+((self.PAR_max-self.PAR_min)/self.NI)*gn
+        self.bw=self.bw_max*math.exp(self.c*gn)
         for i in range(self.N): # iterate over each dec. var. x
             # TODO - is PAR and bw common, or separate for each x?
             # Narazie zakładam stałe, brane z "self."
             
-            self.PAR=self.PAR_min+((self.PAR_max-self.PAR_min)/self.NI)*i
-            self.bw=self.bw_max*math.exp(self.c*i)
-           # self.PAR = PAR[i] #gn = dana generacja numer
+            # self.PAR = PAR[i] #gn = dana generacja numer
             #self.bw = bw[i]
             # PAR = self.PAR #gn = dana generacja numer
             # bw = self.bw
@@ -137,8 +137,10 @@ class IHS:
         ###################################
 
         # Calculate result for the NHV
+        result_change=1
         new_result = self.calculate_f_x(NHV)
-        result_change=abs(new_result-self.best_f_x()) #liczenie do przerwania jeśli zmiana za mała (w mainie)
+        if new_result!=self.best_f_x():
+            result_change=abs(new_result-self.best_f_x()) #liczenie do przerwania jeśli zmiana za mała (w mainie)
         # print('Nowy wynik z wektorem: ', new_result, '   ', NHV) # For debug
         
         # Create a list of sorted dictionary keys, from lowest f_x to highest
