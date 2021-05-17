@@ -12,27 +12,28 @@ class IHS:
         # Step 1: Initialize Paramters:   
         ###################################
         self.f_x = FncToCalculate.fnc #funkcja - czy to tak po prostu zadziala? ~Raczej tak
-        # self.x = [] #zmienna decyzyjna, czy to sie tak inicjalizuje, nie wiem xd
         self.xRanges = FncToCalculate.x # 1:1 przepisz z TaskFunction danych
         self.N = len(self.xRanges) # ilosc zmiennych decyzyjnych 
 
-        self.HMS = 3 # ilosc wektorow rozwiazan w HM
-        self.HMCR = 0.80 # (0,1) decyduje czy wybieramy historyczny czy losowy wektor
-        self.PAR = 0.6 # to mielismy zmieniac, prawdopodobienstwo pitch adjustingu -> x=x+rand*bw
-        self.bw = 1/10 # distance bound wide, liczone w step3
-        self.accuracy = 2 # how many digits are being considered 0.XXXX
+        self.HMS = 6 # ilosc wektorow rozwiazan w HM
+        self.HMCR = 0.95 # (0,1) decyduje czy wybieramy historyczny czy losowy wektor
+        self.accuracy = 3 # how many digits are being considered 0.XXXX
         self.PAR_max=0.99
         self.PAR_min=0.35
         self.bw_max=4
         self.bw_min=1/1000000
+        self.PAR = self.PAR_min # to mielismy zmieniac, prawdopodobienstwo pitch adjustingu -> x=x+rand*bw
+        self.bw = self.bw_max # distance bound wide, liczone w step3
         self.NI=NI
-        self.c=math.log(self.bw_min/self.bw_max)/self.NI
+        self.c = math.log(self.bw_min/self.bw_max)/self.NI
+        self.PAR_CONST = (self.PAR_max-self.PAR_min)/self.NI # Used to calculate current PAR
         ###################################
         # Step 2: Initialize HM:
         ###################################
 
-        self.HM = {} # f_x is key, variables vector is value, 
+        self.HM = {} # f_x is key, variables vector is value,
         # e.g. f_x = 33; x = [2, 1, 3] -> {33: [2, 1, 3]}
+        self.NewSolutions = {} # Stores proposed solutions, that are accepted
 
         HM_i = [] # vector that stores randomized x values
         # generuje losowe wektory rozwiazan
@@ -63,26 +64,34 @@ class IHS:
 
     def displayParameters(self):
         """ Simply prints anything interesting"""
-        print('Improved Harmony Search z parametrami:')
-        print('HMS: ', self.HMS)
-        print('HMCR: ', self.HMCR)
-        print('PAR: ', self.PAR)
-        print('bw: ', self.bw)
-        print('Obecne HM: ')
-        print(self.HM)
-        print('Najlepszy wynik: ', self.best_f_x())
-        print()
         print('Równanie funkcji: ')
         print('      ', self.f_x)
         i = 0
         for x_i_Range in self.xRanges:
             print('Zakres x[', i, ']: ', '[', x_i_Range[0], x_i_Range[1],']')
             i = i+1
+        print('Improved Harmony Search z parametrami:')
+        print('HMS: {:^6}'.format(self.HMS))
+        print('HMCR: {:^6}'.format(self.HMCR))
+        print('PAR: {:^6}'.format(self.PAR))
+        print('bw: {:^6}'.format(self.bw))
+        print('Obecne HM: ')
+        for k, v in self.HM.items():
+            print('   f(x)= {:<7} x='.format(k), v)
+        print()
+        print('Najlepszy wynik: ')
+        print('   f(x)= {:<7} x='.format(self.best_f_x()[0]), self.best_f_x()[1])
+        print()
+        
     
     def best_f_x(self):     
             # Sort dictionary keys, from lowest f_x to highest
-            Sorted_f_x = sorted(self.HM)
-            return Sorted_f_x[0] # Lowest is the first one
+            Sorted_f_x = sorted(self.HM) # Min is the first one
+            Values = tuple((Sorted_f_x[0], self.HM[Sorted_f_x[0]])) # Get (f_x, x[])
+            return Values 
+
+    def best_all(self):
+        return self.NewSolutions
 
     def improvise_and_update(self,gn): 
         """ First, improvise new harmony, then update the HM.
@@ -92,8 +101,8 @@ class IHS:
         ###################################
         
         NHV = [None] * self.N # "New Harmony Vector" - Stores new decision variables values
-        self.PAR=self.PAR_min+((self.PAR_max-self.PAR_min)/self.NI)*gn
-        self.bw=self.bw_max*math.exp(self.c*gn)
+        self.PAR = round(self.PAR_min+(self.PAR_CONST)*gn, 2)
+        self.bw = round(self.bw_max*math.exp(self.c*gn), 6)
         for i in range(self.N): # iterate over each dec. var. x
             # TODO - is PAR and bw common, or separate for each x?
             # Narazie zakładam stałe, brane z "self."
@@ -139,8 +148,8 @@ class IHS:
         # Calculate result for the NHV
         result_change=1
         new_result = self.calculate_f_x(NHV)
-        if new_result!=self.best_f_x():
-            result_change=abs(new_result-self.best_f_x()) #liczenie do przerwania jeśli zmiana za mała (w mainie)
+        if new_result!=self.best_f_x()[0]:
+            result_change=abs(new_result-self.best_f_x()[0]) #liczenie do przerwania jeśli zmiana za mała (w mainie)
         # print('Nowy wynik z wektorem: ', new_result, '   ', NHV) # For debug
         
         # Create a list of sorted dictionary keys, from lowest f_x to highest
@@ -150,6 +159,8 @@ class IHS:
         if new_result < Sorted_f_x[-1] and new_result not in self.HM:
             del self.HM[Sorted_f_x[-1]]     # Remove HM dict entry with key "Sorted_f_x[-1]"
             self.HM[new_result] = NHV       # Add new vector and result to HM
+
+            self.NewSolutions[new_result] = NHV       # Add new vector and result to good solutions
         # print(self.HM) # for debug
 
         return result_change #new_result

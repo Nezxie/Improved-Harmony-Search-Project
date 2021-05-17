@@ -6,6 +6,8 @@ from IHS import IHS
 import numpy as np
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+# from mpl_toolkits.mplot3d import Axes3D
 # from menu import handle_menu_input, display_menu # waits for extra program modules
 
 # I use those interchangeably: 
@@ -149,9 +151,8 @@ def calculate_task():
     system('pause')
 
 def calculate_IHS():
-    max_iterations = 200000
-    desired_result = 0.01 # TODO change to lack of progress in last iterations
-    min_result_change=0.00001
+    max_iterations = 10000
+    min_result_change=0.001
     
     algo = IHS(currentFunction,max_iterations) # without "algo": missing 1 required positional argument: 'self'
     algo.displayParameters() 
@@ -164,23 +165,22 @@ def calculate_IHS():
     iterations = 0
     # Improvise and update until max iterations passed or algo is better than desired result. 
     while iterations < max_iterations: #algo.best_f_x() > desired_result and
-        result_change=algo.improvise_and_update(iterations)
+        result_change = round(algo.improvise_and_update(iterations), 3)
         
-        if result_change<min_result_change:
+        if result_change < min_result_change:
             break
         iterations += 1
     # Summary after hard work:
-    #print('TU JEST RESULT CHANGE!!!!!' ,result_change)
+    print('Iter: ' ,iterations, '   Poprawa wyniku: ', result_change)
     algo.displayParameters() 
     print('Komentarz z obecnej funkcji: ')
     print('     ', currentFunction.scoreComment)
-
-     ###################################
-    # Rysowanie dla funkcji dwuch zmiennych (wykres 2D)
+    
+    
     ###################################
-
+    # Rysowanie dla funkcji dwoch zmiennych (wykres 2D)
     if  len(currentFunction.x)==2:
-        point=algo.HM.get(algo.best_f_x())
+        point=algo.HM.get(algo.best_f_x()[0])
         delta = 0.1 #co ile krok, im mniejszy tym lepiej
         x=[0,0,0,0,0]
         Z=[]
@@ -196,31 +196,36 @@ def calculate_IHS():
            Z.append(tmpZ)
 
         fig,ax = plt.subplots()
-        CS = ax.contour(X, Y, Z,levels=20) #wyswietlanie, levels = ilosc lini
-        ax.clabel(CS, inline=True, fontsize=10)  #numerowanie warotsci warstwic
-        ax.set_title('Warstwica ')
-        ax.plot(point[0],point[1],'o',color='red')
+        CS = ax.contour(X, Y, Z) #wyswietlanie, levels = ilosc lini
+        ax.clabel(CS, inline=True, fontsize=10, fmt='%1.1f')  #numerowanie warotsci warstwic
+        ax.xaxis.grid(True, zorder=0)
+        ax.yaxis.grid(True, zorder=0)
+        ax.set_title('Warstwice 2D')
+        best_x = []
+        best_y = []
+        best_fx = []
+        plot_best_x = []
+        plot_best_y = []
+        for k, v in algo.best_all().items():
+            best_x.append(v[0])
+            best_y.append(v[1])
+            best_fx.append(k)
+        # ax.plot(best_x,best_y,'o',color='red')
+        best_len = len(best_fx)
+        best_iterator = int(best_len*0.1)
+        for xy in range(0,best_len,best_iterator):
+            plot_best_x.append(best_x[xy])
+            plot_best_y.append(best_y[xy])
+            ax.plot(best_x[xy],best_y[xy],'o',color='blue')
+        ax.plot(plot_best_x,plot_best_y,color='red')
         fig=plt.figure()
         ax3D= plt.axes(projection='3d')
-        ax3D.contour3D(X,Y,Z,50) #50 - ilosc warstwic
-        ax3D.plot3D(point[0],point[1],algo.best_f_x(),'red',marker='o')
+        ax3D.contour3D(X,Y,Z, 10) #50 - ilosc warstwic
+        ax3D.scatter(point[0],point[1],algo.best_f_x()[0],marker='o',color='red')
         plt.show()
     #print(algo.HM.get(algo.best_f_x()))
     system('pause')
 
-'''    f_values=[] #wartosci funkcji
-    iter=0
-    max_iter=1000
-    kryt_wzrostu=0.001
-    zmiana=1
-    while iter<max_iter && zmiana>kryt_wzrostu:
-        new_x=IHS.improvise_new()
-        f_values(iter)=IHS.calculate(new_x)
-        zmiana=IHS.update(new_x,f(iter))
-    plot(iter,f_values)
-    #if TaskFunction.x=2
-        #graph()  #co przyjmuje graph sprawdzic sobie !!!!
-'''
 
 def quit_program():
     """Quit main loop using bool variable"""
@@ -271,7 +276,7 @@ def display_menu(currentFnc):
     print('-----------------------------------------------')
     print('1 - Zmień parametry aktualnego zadania')
     print('2 - Zmień f. celu na gotowy szablon')
-    print('3 - Zmień f. celu na testową(f. kwadratowa)')
+    print('3 - Zmień f. celu na testową(f. koła)')
     print('4 - Wpisz ręcznie nową f. celu(utwórz plik)')
     print('5 - Policz')
     print('6 - IHS')
